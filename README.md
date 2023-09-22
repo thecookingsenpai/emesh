@@ -15,6 +15,14 @@ Any device that is compatible with the current Meshtastic for Python version sho
 ### Features
 
 - [x] A fully functional GUI for Meshtastic even if you are using the terminal (thanks [Textualize for its Textual library](https://github.com/Textualize/textual))
+- [x] Serial Port connection (serial or usb over serial)
+- [ ] Bluetooth connection (not yet, maybe not ever)
 - [x] Support for beaconing (emitting a signal every X seconds)
 	- [ ] Support for beaconing time customization
+- [x] Possibility of specifying the serial port to use
 - [x] Listening and showing messages in a clear and clean way
+- [x] Easy to use chat-like interface with advanced commands
+
+### License
+
+No licenses, this one is free software
