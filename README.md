@@ -14,7 +14,7 @@ Any device that is compatible with the current Meshtastic for Python version sho
 
 ### Features
 
-[x] A fully functional GUI for Meshtastic even if you are using the terminal (thanks [Textualize for its Textual library](https://github.com/Textualize/textual))
-[x] Support for beaconing (emitting a signal every X seconds)
-	[ ] Support for beaconing time customization
-[x] Listening and showing messages in a clear and clean way
+- [x] A fully functional GUI for Meshtastic even if you are using the terminal (thanks [Textualize for its Textual library](https://github.com/Textualize/textual))
+- [x] Support for beaconing (emitting a signal every X seconds)
+	- [ ] Support for beaconing time customization
+- [x] Listening and showing messages in a clear and clean way
