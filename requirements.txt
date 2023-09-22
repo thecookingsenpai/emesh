@@ -1,0 +1,8 @@
+pytap2
+pubsub
+meshtastic
+cryptography
+deterministic-rsa-keygen
+dotenv
+
+
