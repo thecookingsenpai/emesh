@@ -4,5 +4,7 @@ meshtastic
 cryptography
 deterministic-rsa-keygen
 dotenv
+textual
+textual-dev
 
 

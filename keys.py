@@ -1,6 +1,7 @@
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
 import rsa
+import os
 
 # LINK https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed25519/
 
@@ -14,6 +15,17 @@ privateRSAKey = None
 privateRSAPEM = None
 publicRSAKey = None
 publicRSAPEM = None
+
+# INFO Common entry point to authentication
+def ensure():
+    if(
+        os.path.exists("private.key")
+	):
+        print("[ED25519] Loading ed25519 private key...")
+        load()
+    else:
+        print("[ED25519] Creating ed25519 private key...")
+        create()
 
 def create():
     global privateKey
@@ -32,12 +44,29 @@ def create():
     publicDerivation()
     # RSA Creation
     derive()
-    
+    # Writing file
+    save()
+
+def load(filepath="./"):
+    global privateBytes
+    # Reading file
+    with open(filepath + "private.key", "rb") as keyFile:
+        privateBytes = keyFile.read()
+    # Loading key
+    try:
+        loadBytes(privateBytes)
+        print("[ED25519] Loaded ed25519 private key from file [+]")
+    except Exception as e:
+        print("[ED25519] Could not load ed25519 private key: [X]")
+        print(e)
+        exit()
+        
 # INFO privateBytesProvided must be the same kind of data as the privateBytes (aka bytes)
-def load(privateBytesProvided):
+def loadBytes(privateBytesProvided: bytes):
     global privateKey
-    print("[ED25519] Loading ed25519 private key...")
+    print("[ED25519] Loading ed25519 private key from bytes... [*]")
     privateKey = ed25519.Ed25519PrivateKey.from_private_bytes(privateBytesProvided)
+    print("[ED25519] Loaded ed25519 private key from bytes [+]")
     #print(privateKey)
     # Public Key Creation
     publicDerivation()
@@ -48,13 +77,15 @@ def load(privateBytesProvided):
 def publicDerivation():
     global publicKey
     global publicBytes
-    print("[ED25519] Generating ed25519 public key...")
+    print("[ED25519] Generating ed25519 public key...[*]")
     publicKey = privateKey.public_key()
     #print(publicKey)
     publicBytes = publicKey.public_bytes(
         encoding=serialization.Encoding.Raw,
         format=serialization.PublicFormat.Raw,
 	)
+    print("[ED25519] We are: " + publicBytes.hex())
+    print("[ED25519] Generated ed25519 public key [+]")
    #print(publicBytes.hex())
     
 # INFO RSA Derivation
@@ -64,11 +95,12 @@ def derive():
     global publicRSAKey
     global publicRSAPEM
     # RSA Creation
-    print("[RSA] Generating RSA keys from ed25519 identity...")
+    print("[RSA] Generating RSA keys from ed25519 identity... [*]")
     privateRSAKey = rsa.generate_key(privateBytes.hex()) # So that the two are linked
     privateRSAPEM = privateRSAKey.exportKey("PEM")
     publicRSAKey = privateRSAKey.public_key()
     publicRSAPEM = publicRSAKey.exportKey("PEM")
+    print("[RSA] Generated RSA keys from ed25519 identity [+]")
     #print(privateRSAPEM)
     #print(publicRSAPEM)
 
@@ -109,23 +141,8 @@ def verify(message, signature, publicKeyProvided=None):
 
 # ANCHOR Utilities
 def save():
-    global privateKey
     global privateBytes
-    global publicKey
-    global publicBytes
-    global privateRSAKey
-    global privateRSAPEM
-    global publicRSAKey
-    global publicRSAPEM
-    print("[ED25519] Saving ed25519 keys...")
+    print("[ED25519] Saving ed25519 key...")
     with open("private.key", "wb") as f:
         f.write(privateBytes)
-    with open("public.key", "wb") as f:
-        f.write(publicBytes)
-    print("[RSA] Saving RSA keys...")
-    with open("private.pem", "wb") as f:
-        f.write(privateRSAPEM)
-    with open("public.pem", "wb") as f:
-        f.write(publicRSAPEM)
-    print("[ED25519] Keys saved!")
-    print("[RSA] Keys saved!")
+	

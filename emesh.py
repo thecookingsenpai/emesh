@@ -11,16 +11,26 @@ serial_port = None
 interface = None
 
 beaconOn = False
+beaconingPrioritySettings = False # Only for GUI usage, comment out if you don't want to use the GUI
+
 bnum = 0
+
+connected = False
+
+msg_received = []
 
 # NOTE Just an easy wrapper around sha256
 def hash(input):
     return sha256(input.encode('utf-8')).hexdigest()
 
 def onReceive(packet, interface):
+    global msg_received
+    print("[RECEIVED] Received packet: " + str(packet))
 	# called when a packet arrives
     try:
         decoded = packet["decoded"]
+        decoded["from"] = packet["from"]
+        decoded["to"] = packet["to"]
     except:
         print("[ERROR] Could not decode packet: discarding it")
         return
@@ -29,10 +39,13 @@ def onReceive(packet, interface):
     # Let's take the type of the packet
     packet_type = decoded["portnum"]
     print("Received packet type: " + packet_type)
+    msg_received.append(decoded)
 
 def onConnection(interface, topic=pub.AUTO_TOPIC):
+    global connected
 	# called when we (re)connect to the radio
 	# defaults to broadcast, specify a destination ID if you wish
+    connected = True
     theName =  json.dumps(interface.getShortName())
     interface.sendText(theName + " greets you!")
 
@@ -53,12 +66,22 @@ def beacon(encrypted=False):
         }
         interface.sendText(json.dumps(beacon))
         print("[BEACONING] Beacon sent: " + json.dumps(beacon))
-    
+
+def sendRaw(raw):
+    print("[SEND RAW] Sending raw: " + raw)
+    interface.sendText(raw)
+    print("[SEND RAW] Raw sent: " + raw)
+
+def sendRawBytes(raw):
+    print("[SEND RAW BYTES] Sending raw: " + raw)
+    interface.sendBytes(raw)
+    print("[SEND RAW BYTES] Raw sent: " + raw)
+
 def connect(serialPort=None):
     global serial_port
     global interface
     # Ensuring we have an identity
-    keys.create()
+    keys.ensure()
     # Connecting to the radio
     serial_port = serialPort
     pub.subscribe(onReceive, "meshtastic.receive")
