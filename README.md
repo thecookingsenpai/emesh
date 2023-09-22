@@ -23,6 +23,19 @@ Any device that is compatible with the current Meshtastic for Python version sho
 - [x] Listening and showing messages in a clear and clean way
 - [x] Easy to use chat-like interface with advanced commands
 
+
+### Installation and usage
+
+	git clone https://github.com/thecookingsenpai/emesh
+	cd emesh
+	pip install -r requirements.txt
+	python gui.py
+
+You can also play with term.py and emesh.py and use directly
+	python term.py
+
+If you really hate GUIs.
+
 ### License
 
 No licenses, this one is free software

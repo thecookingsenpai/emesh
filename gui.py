@@ -10,6 +10,7 @@ from textual.validation import Function, Number, ValidationResult, Validator
 from textual import events, on
 import threading
 import term
+from dotenv import load_dotenv
 
 
 class MeshTerm(App):
@@ -38,8 +39,15 @@ class MeshTerm(App):
                 Input(placeholder="Send something...", id="msg"),
                 Button("Send", id="send", disabled=True)
         ))
+        
         yield Horizontal(VerticalScroll(
             Button("Exit", id="exit"),
+            Label("CONNECTED RADIO INFO"),
+            VerticalScroll(
+                Label("No radio connected", id="radio_namebox"),
+                Label("", id="radio_id"),
+                Label("", id="radio_user"),
+            )
         ),
             VerticalScroll(
             Sparkline([1, 2, 3, 3, 3, 3, 3], summary_function=min,),
@@ -91,6 +99,8 @@ class MeshTerm(App):
     
     # INFO Managing connection to the device
     def connect(self):
+        self.query_one("#connect").disabled = True
+        self.query_one("#connect").value = "CONNECTING..."
         self.port = self.query_one("#port").value
         self.port = self.port.strip()
         self.messageToShow = "CONNECTING TO " + self.port + "..."
@@ -102,6 +112,25 @@ class MeshTerm(App):
     def change_value(self, id, replacement):
         self.query_one(id).update(replacement)
     # !SECTION Actions
+    
+    def loadEnv(self):
+        self.env = {}
+        with open(".env", "r") as f:
+            textenv = f.readlines()
+            for line in textenv:
+                key, value = line.split("=")
+                self.env[key.strip()] = value.strip()
+        return self.env
+
+    def saveEnv(self):
+        preparedEnv = ""
+        for key, value in self.env.items():
+            preparedEnv += key + "=" + value + "\n"
+        with open(".env", "w") as f:
+            f.write(preparedEnv)
+            f.flush()
+        return self.env
+            
 
     def watcher(self):
         while not self.stopWatchdog:
@@ -123,8 +152,14 @@ class MeshTerm(App):
                 # If we are connected we should get our variables
                 if term.emesh.connected:
                     name = term.emesh.interface.getShortName()
+                    self.query_one("#connect").disabled = False
+                    self.query_one("#connect").value = "Reconnect"
                     self.query_one("#radio_name").update("Connected to: " + name)
                     self.query_one("#send").disabled = False
+                    # Also updating our infos
+                    self.query_one("#radio_namebox").update("Radio NAME: " + name)
+                    self.query_one("#radio_id").update("Radio ID (long name): " + str(term.emesh.interface.getLongName()))
+                    self.query_one("#radio_user").update("Radio USER: " + str(term.emesh.interface.getMyUser()))
                 # Populating the received messages
                 for receivd in term.emesh.msg_received:
                     if receivd["portnum"] == "TEXT_MESSAGE_APP":
