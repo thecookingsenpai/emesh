@@ -93,9 +93,9 @@ class MeshTerm(App):
         textToSend = self.query_one("#msg").value
         term.emesh.sendRaw(textToSend)
         self.query_one("#msg").value = ""
-        self.messageToShow = "MESSAGE SENT: " + textToSend
+        self.messageToShow = f"MESSAGE SENT: {textToSend}"
         self.query_one("#main_log").write(self.messageToShow)
-        self.query_one("#received_messages").write("[You] > " + textToSend)
+        self.query_one("#received_messages").write(f"[You] > {textToSend}")
     
     # INFO Managing connection to the device
     def connect(self):
@@ -103,7 +103,7 @@ class MeshTerm(App):
         self.query_one("#connect").value = "CONNECTING..."
         self.port = self.query_one("#port").value
         self.port = self.port.strip()
-        self.messageToShow = "CONNECTING TO " + self.port + "..."
+        self.messageToShow = f"CONNECTING TO {self.port}..."
         if not self.port or self.port == "":
             self.port = None
         self.instance = threading.Thread(target=term.main)
@@ -123,9 +123,9 @@ class MeshTerm(App):
         return self.env
 
     def saveEnv(self):
-        preparedEnv = ""
-        for key, value in self.env.items():
-            preparedEnv += key + "=" + value + "\n"
+        preparedEnv = "".join(
+            f"{key}={value}" + "\n" for key, value in self.env.items()
+        )
         with open(".env", "w") as f:
             f.write(preparedEnv)
             f.flush()
@@ -154,12 +154,16 @@ class MeshTerm(App):
                     name = term.emesh.interface.getShortName()
                     self.query_one("#connect").disabled = False
                     self.query_one("#connect").value = "Reconnect"
-                    self.query_one("#radio_name").update("Connected to: " + name)
+                    self.query_one("#radio_name").update(f"Connected to: {name}")
                     self.query_one("#send").disabled = False
                     # Also updating our infos
-                    self.query_one("#radio_namebox").update("Radio NAME: " + name)
-                    self.query_one("#radio_id").update("Radio ID (long name): " + str(term.emesh.interface.getLongName()))
-                    self.query_one("#radio_user").update("Radio USER: " + str(term.emesh.interface.getMyUser()))
+                    self.query_one("#radio_namebox").update(f"Radio NAME: {name}")
+                    self.query_one("#radio_id").update(
+                        f"Radio ID (long name): {str(term.emesh.interface.getLongName())}"
+                    )
+                    self.query_one("#radio_user").update(
+                        f"Radio USER: {str(term.emesh.interface.getMyUser())}"
+                    )
                 # Populating the received messages
                 for receivd in term.emesh.msg_received:
                     if receivd["portnum"] == "TEXT_MESSAGE_APP":
@@ -168,7 +172,7 @@ class MeshTerm(App):
                         self.query_one("#received_messages").write(textToShow)
                 term.emesh.msg_received = []
             except Exception as e:
-                self.change_value("#message_to_show", "ERROR: " + str(e))
+                self.change_value("#message_to_show", f"ERROR: {str(e)}")
 
 
 if __name__ == "__main__":

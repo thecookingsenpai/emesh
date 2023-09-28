@@ -25,7 +25,7 @@ def hash(input):
 
 def onReceive(packet, interface):
     global msg_received
-    print("[RECEIVED] Received packet: " + str(packet))
+    print(f"[RECEIVED] Received packet: {str(packet)}")
 	# called when a packet arrives
     try:
         decoded = packet["decoded"]
@@ -38,7 +38,7 @@ def onReceive(packet, interface):
     print(decoded)
     # Let's take the type of the packet
     packet_type = decoded["portnum"]
-    print("Received packet type: " + packet_type)
+    print(f"Received packet type: {packet_type}")
     msg_received.append(decoded)
 
 def onConnection(interface, topic=pub.AUTO_TOPIC):
@@ -47,35 +47,35 @@ def onConnection(interface, topic=pub.AUTO_TOPIC):
 	# defaults to broadcast, specify a destination ID if you wish
     connected = True
     theName =  json.dumps(interface.getShortName())
-    interface.sendText(theName + " greets you!")
+    interface.sendText(f"{theName} greets you!")
 
 # INFO Monitor and, if applicable, start beaconing using encrypted messages or plaintext messages
 def beacon(encrypted=False):
-        # If we are supposed to be beaconing, we need to send a beacon and wait 10 seconds
-        print("[BEACONING] Sending beacon...")
-        # NOTE Generating a beacon first
-        our_info = interface.getShortName()
-        our_timestamp = int(time.time())
-        global bnum
-        bnum += 1
-        beacon = {
-            "type": "beacon",
-            "number": bnum,
-            "timestamp": our_timestamp,
-            "info": our_info
-        }
-        interface.sendText(json.dumps(beacon))
-        print("[BEACONING] Beacon sent: " + json.dumps(beacon))
+    # If we are supposed to be beaconing, we need to send a beacon and wait 10 seconds
+    print("[BEACONING] Sending beacon...")
+    # NOTE Generating a beacon first
+    our_info = interface.getShortName()
+    our_timestamp = int(time.time())
+    global bnum
+    bnum += 1
+    beacon = {
+        "type": "beacon",
+        "number": bnum,
+        "timestamp": our_timestamp,
+        "info": our_info
+    }
+    interface.sendText(json.dumps(beacon))
+    print(f"[BEACONING] Beacon sent: {json.dumps(beacon)}")
 
 def sendRaw(raw):
-    print("[SEND RAW] Sending raw: " + raw)
+    print(f"[SEND RAW] Sending raw: {raw}")
     interface.sendText(raw)
-    print("[SEND RAW] Raw sent: " + raw)
+    print(f"[SEND RAW] Raw sent: {raw}")
 
 def sendRawBytes(raw):
-    print("[SEND RAW BYTES] Sending raw: " + raw)
+    print(f"[SEND RAW BYTES] Sending raw: {raw}")
     interface.sendBytes(raw)
-    print("[SEND RAW BYTES] Raw sent: " + raw)
+    print(f"[SEND RAW BYTES] Raw sent: {raw}")
 
 def connect(serialPort=None):
     global serial_port

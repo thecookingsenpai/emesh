@@ -50,7 +50,7 @@ def create():
 def load(filepath="./"):
     global privateBytes
     # Reading file
-    with open(filepath + "private.key", "rb") as keyFile:
+    with open(f"{filepath}private.key", "rb") as keyFile:
         privateBytes = keyFile.read()
     # Loading key
     try:
@@ -81,10 +81,10 @@ def publicDerivation():
     publicKey = privateKey.public_key()
     #print(publicKey)
     publicBytes = publicKey.public_bytes(
-        encoding=serialization.Encoding.Raw,
-        format=serialization.PublicFormat.Raw,
-	)
-    print("[ED25519] We are: " + publicBytes.hex())
+    encoding=serialization.Encoding.Raw,
+    format=serialization.PublicFormat.Raw,
+    )
+    print(f"[ED25519] We are: {publicBytes.hex()}")
     print("[ED25519] Generated ed25519 public key [+]")
    #print(publicBytes.hex())
     
@@ -110,9 +110,7 @@ def encrypt(message, publicKey=None):
     # Supporting self encryption
     if not publicKey:
         publicKey = publicRSAKey
-    # Generating the encrypted message
-    encrypted = rsa.encrypt(message, publicKey)
-    return encrypted
+    return rsa.encrypt(message, publicKey)
 
 # INFO Decrypting a message (returning bytes)
 def decrypt(message, privateKey=None):
@@ -120,15 +118,12 @@ def decrypt(message, privateKey=None):
     # Supporting self decryption by default
     if not privateKey:
         privateKey = privateRSAKey
-    # Generating the decrypted message
-    decrypted = rsa.decrypt(message, privateKey)
-    return decrypted
+    return rsa.decrypt(message, privateKey)
 
 # INFO Sign a message after encoding it (returning bytes)
 def sign(message):
     global privateKey
-    signature = privateKey.sign(message.encode('utf-8'))
-    return signature
+    return privateKey.sign(message.encode('utf-8'))
 
 # INFO Verify a message (returning boolean)
 def verify(message, signature, publicKeyProvided=None):

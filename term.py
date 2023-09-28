@@ -33,7 +33,7 @@ def init():
 def preparse():
     vars = {}
     # Parsing the port
-    if not os.getenv('PORT') == "default":
+    if os.getenv('PORT') != "default":
         vars['port'] = os.getenv('PORT')
     return vars    
 
@@ -56,7 +56,7 @@ def main():
         load_dotenv()
         emesh.beaconOn = (os.getenv('BEACONING')=="True") # So we can even stop beaconing from here
         emesh.beaconOn = emesh.beaconingPrioritySettings # GUI variables are prioritized
-        print("[MAIN CYCLE] Beaconing: " + str(emesh.beaconOn))
+        print(f"[MAIN CYCLE] Beaconing: {str(emesh.beaconOn)}")
         # NOTE As the scenarios can include long range radios, we have low bandwidth.
         # By waiting N seconds between beacons, we ensure that we are not beaconing
         # too often and spamming the radio channel with beacons.
@@ -66,7 +66,7 @@ def main():
             if (beaconCooldown > 0):
                 isMultipleOfTen = (beaconCooldown % 10 == 0)
                 if isMultipleOfTen:
-                    print("[MAIN CYCLE] Beacon cooldown: " + str(beaconCooldown))
+                    print(f"[MAIN CYCLE] Beacon cooldown: {str(beaconCooldown)}")
                 beaconCooldown -= 1
             else:
                 print("[MAIN CYCLE] Beaconing is activated, proceeding...")
