@@ -13,7 +13,7 @@ interface = None
 beaconOn = False
 beaconingPrioritySettings = False # Only for GUI usage, comment out if you don't want to use the GUI
 
-bnum = 0
+sbnum = 0
 
 connected = False
 
