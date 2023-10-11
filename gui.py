@@ -136,7 +136,10 @@ class MeshTerm(App):
         while not self.stopWatchdog:
             time.sleep(1)
             # Refreshing the environment variables and setting ours if needed
-            term.emesh.beaconingPrioritySettings = self.query_one("#beaconingBox").value
+            try:
+                term.emesh.beaconingPrioritySettings = self.query_one("#beaconingBox").value
+            except Exception as e:
+                print("[WARNING] beaconingBox element is not reachable - this may be temporary.")
             # Loading messages into the gui
             try:
                 if (term.outputs != term.last_output):
