@@ -137,7 +137,11 @@ class MeshTerm(App):
             time.sleep(1)
             # Refreshing the environment variables and setting ours if needed
             try:
-                term.emesh.beaconingPrioritySettings = self.query_one("#beaconingBox").value
+                term.emesh.beaconingPrioritySettings = False
+                term.emesh.beaconOn = self.query_one("#beaconingBox").value
+                print("[WATCHDOG] Refreshing environment variables...")
+                os.environ['BEACONING'] = str(term.emesh.beaconOn)
+                print("[WATCHDOG] Environment variables refreshed: " + str(os.environ['BEACONING']))
             except Exception as e:
                 print("[WARNING] beaconingBox element is not reachable - this may be temporary.")
             # Loading messages into the gui
@@ -157,12 +161,16 @@ class MeshTerm(App):
                     name = term.emesh.interface.getShortName()
                     self.query_one("#connect").disabled = False
                     self.query_one("#connect").value = "Reconnect"
-                    self.query_one("#radio_name").update("Connected to: " + name)
+                    self.query_one("#radio_name").update(f"Connected to: {name}")
                     self.query_one("#send").disabled = False
                     # Also updating our infos
-                    self.query_one("#radio_namebox").update("Radio NAME: " + name)
-                    self.query_one("#radio_id").update("Radio ID (long name): " + str(term.emesh.interface.getLongName()))
-                    self.query_one("#radio_user").update("Radio USER: " + str(term.emesh.interface.getMyUser()))
+                    self.query_one("#radio_namebox").update(f"Radio NAME: {name}")
+                    self.query_one("#radio_id").update(
+                        f"Radio ID (long name): {str(term.emesh.interface.getLongName())}"
+                    )
+                    self.query_one("#radio_user").update(
+                        f"Radio USER: {str(term.emesh.interface.getMyUser())}"
+                    )
                 # Populating the received messages
                 for receivd in term.emesh.msg_received:
                     if receivd["portnum"] == "TEXT_MESSAGE_APP":

@@ -46,17 +46,23 @@ def main():
     # Main cycle
     print("[MAIN CYCLE] Starting watchdog...")
     was_connected = False
+    cooldownHeader = False
     while not ((os.getenv('FORCE_QUIT')=="True") or forceQuit):
         # This is just a way to check if we need to notify the gui
         are_connected = emesh.connected
         if (are_connected!= was_connected):
             print("[GUI] Changed connection status")
             messageToShow = "CONNECTION ESTABLISHED"
+            was_connected = are_connected
         # NOTE Reloading .env ensures that we can control the app cycle externally
         load_dotenv()
-        emesh.beaconOn = (os.getenv('BEACONING')=="True") # So we can even stop beaconing from here
-        emesh.beaconOn = emesh.beaconingPrioritySettings # GUI variables are prioritized
-        print("[MAIN CYCLE] Beaconing: " + str(emesh.beaconOn))
+        # NOTE Overriding is always possible, otherwise we have to rely on gui.py
+        if emesh.beaconingPrioritySettings:
+            print("[MAIN CYCLE] Terminal mode: getting beaconing from .env...")
+            emesh.beaconOn = (os.getenv('BEACONING')=="True")
+        else:
+            print("[MAIN CYCLE] GUI mode: getting beaconing from GUI...")           
+        print(f"[MAIN CYCLE] Beaconing: {emesh.beaconOn}")
         # NOTE As the scenarios can include long range radios, we have low bandwidth.
         # By waiting N seconds between beacons, we ensure that we are not beaconing
         # too often and spamming the radio channel with beacons.
@@ -64,11 +70,15 @@ def main():
             print("[MAIN CYCLE] Checking for beacon cooldown...")
             # The following keeps the code running while we cooldown beaconing too
             if (beaconCooldown > 0):
+                if not cooldownHeader:
+                    print("+++ COOLDOWN ACTIVE +++")
+                    cooldownHeader = True
                 isMultipleOfTen = (beaconCooldown % 10 == 0)
                 if isMultipleOfTen:
-                    print("[MAIN CYCLE] Beacon cooldown: " + str(beaconCooldown))
+                    print(f"[MAIN CYCLE] Beacon cooldown: {str(beaconCooldown)}")
                 beaconCooldown -= 1
             else:
+                print("*** COOLDOWN COMPLETE ***")
                 print("[MAIN CYCLE] Beaconing is activated, proceeding...")
                 beaconCooldown = int(os.getenv('BEACONING_INTERVAL'))
                 emesh.beacon()
