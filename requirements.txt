@@ -3,7 +3,7 @@ pubsub
 meshtastic
 cryptography
 deterministic-rsa-keygen
-dotenv
+python-dotenv
 textual
 textual-dev
 

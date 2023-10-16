@@ -31,10 +31,12 @@ def init():
 
 # INFO Parsing our environment variables
 def preparse():
+    load_dotenv()
     vars = {}
     # Parsing the port
     if not os.getenv('PORT') == "default":
         vars['port'] = os.getenv('PORT')
+    print(os.getenv('PORT'))
     return vars    
 
 def main():
